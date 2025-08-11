@@ -139,6 +139,7 @@ Use this checklist to ensure your WePool application is ready for Railway deploy
 - [ ] Environment variable problems
 - [ ] Migration errors
 - [ ] Port binding issues
+- [ ] If you hit a 500 due to a missing static manifest entry, temporarily set `DISABLE_MANIFEST=1` on Railway to serve unhashed files while you add the missing asset(s), then unset it.
 
 ### ✅ Debug Tools
 - [ ] Railway logs are accessible

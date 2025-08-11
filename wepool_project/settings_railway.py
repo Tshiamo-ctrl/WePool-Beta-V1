@@ -149,7 +149,11 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@wepooltribe.c
 
 # Static files for Railway
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Allow emergency fallback to non-manifest storage to prevent 500s if a file is missing
+if os.environ.get('DISABLE_MANIFEST', '0') == '1':
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+else:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files for Railway
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

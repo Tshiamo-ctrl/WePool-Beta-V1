@@ -30,7 +30,16 @@ echo "⚙️  Django settings: $DJANGO_SETTINGS_MODULE"
 
 # Collect static files
 echo "📁 Collecting static files..."
-python manage.py collectstatic --noinput
+python manage.py collectstatic --noinput || true
+# Verify critical assets are present in manifest
+if [ -f "staticfiles/staticfiles.json" ]; then
+  if ! grep -q "js/landing.js" staticfiles/staticfiles.json; then
+    echo "⚠️  landing.js not found in manifest. Re-running collectstatic and listing dirs..."
+    python manage.py collectstatic --noinput || true
+    ls -la static/js || true
+    ls -la staticfiles/js || true
+  fi
+fi
 
 # Wait for database readiness (if configured)
 MAX_DB_RETRIES=${MAX_DB_RETRIES:-20}
