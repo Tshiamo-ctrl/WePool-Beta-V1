@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - DJANGO_SETTINGS_MODULE=wepool_project.settings
+      - DB_ENGINE=django.db.backends.sqlite3
+      - DB_NAME=db.sqlite3
+      - SECRET_KEY=django-insecure-development-secret-key
+      - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "--reload", "--timeout", "120", "wepool_project.wsgi:application"]
+
+  db:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=wepool_dev
+      - POSTGRES_USER=wepool_user
+      - POSTGRES_PASSWORD=wepool_password
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wepool_user -d wepool_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_dev_data:
+  static_volume:
+  media_volume:

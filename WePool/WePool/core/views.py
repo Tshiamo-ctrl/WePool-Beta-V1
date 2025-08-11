@@ -6,9 +6,11 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.db import connection
 from users.models import Profile
 from .models import Referral
 from .utils import build_referral_matrix, get_referral_stats
+from django.utils import timezone
 
 @login_required
 def referral_matrix_view(request):
@@ -53,3 +55,24 @@ def direct_referrals_view(request):
         'referrals': referrals,
         'profile': profile
     })
+
+def health_check(request):
+    """Health check endpoint for container monitoring"""
+    try:
+        # Test database connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+        
+        return JsonResponse({
+            'status': 'healthy',
+            'database': 'connected',
+            'timestamp': timezone.now().isoformat()
+        }, status=200)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'unhealthy',
+            'database': 'disconnected',
+            'error': str(e),
+            'timestamp': timezone.now().isoformat()
+        }, status=503)
