@@ -1,5 +1,4 @@
-
-# Use Python 3.10 slim image
+# Railway-optimized Dockerfile for WePool
 FROM python:3.10-slim
 
 # Set environment variables
@@ -37,16 +36,8 @@ RUN python manage.py collectstatic --noinput
 # Create media directory
 RUN mkdir -p media
 
-# Expose port (Railway will override this)
+# Expose port
 EXPOSE 8000
 
-# Health check with fallback port
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/core/health/ || exit 1
-
-# Copy and use the Railway entrypoint script
-COPY railway-entrypoint.sh /app/
-RUN chmod +x /app/railway-entrypoint.sh
-
-# Run the application using the entrypoint script
-CMD ["/app/railway-entrypoint.sh"]
+# Simple startup command that Railway can handle
+CMD python manage.py runserver 0.0.0.0:8000
