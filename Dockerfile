@@ -44,9 +44,9 @@ RUN mkdir -p media
 # Expose port (Railway will override this)
 EXPOSE 8000
 
-# Health check with fallback port
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/core/health/ || exit 1
+# Health check honoring dynamic PORT
+HEALTHCHECK --interval=30s --timeout=30s --start-period=10s --retries=5 \
+    CMD /bin/sh -c 'curl -sf http://localhost:${PORT:-8000}/core/railway-health/ || exit 1'
 
 # Run the application using the entrypoint script
 CMD ["/app/railway-entrypoint.sh"]

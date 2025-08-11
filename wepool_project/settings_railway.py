@@ -78,7 +78,7 @@ except ImportError as e:
 
 # Railway-specific settings
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '.railway.app').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '.railway.app,localhost,127.0.0.1').split(',')
 
 # Security settings for Railway
 # Disable SSL redirect to prevent loops - Railway handles HTTPS
@@ -93,40 +93,42 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
 # CSRF settings for Railway
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'https://.railway.app').split(',')
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'https://*.railway.app,http://localhost,http://127.0.0.1,https://localhost,https://127.0.0.1').split(',')
 
-# Database - Railway PostgreSQL with fallback
+# Database - Prefer DATABASE_URL (Railway default), fallback to discrete vars, then SQLite
 try:
-    # Check if PostgreSQL environment variables are set
-    db_host = os.environ.get('DB_HOST')
-    db_password = os.environ.get('DB_PASSWORD')
-    
-    if db_host and db_password:
-        # Use PostgreSQL if environment variables are available
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        import dj_database_url  # type: ignore
         DATABASES = {
-            'default': {
-                'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.postgresql'),
-                'NAME': os.environ.get('DB_NAME', 'railway'),
-                'USER': os.environ.get('DB_USER', 'postgres'),
-                'PASSWORD': db_password,
-                'HOST': db_host,
-                'PORT': os.environ.get('DB_PORT', '5432'),
-                'CONN_MAX_AGE': 600,
-                'OPTIONS': {
-                    'sslmode': 'require',
-                },
-            }
+            'default': dj_database_url.parse(database_url, conn_max_age=600, ssl_require=True)
         }
-        print(f"Using PostgreSQL database: {db_host}")
+        print("Using PostgreSQL via DATABASE_URL")
     else:
-        # Fallback to SQLite if PostgreSQL variables are missing
-        print("PostgreSQL variables not found, using SQLite fallback")
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
+        db_host = os.environ.get('DB_HOST')
+        db_password = os.environ.get('DB_PASSWORD')
+        if db_host and db_password:
+            DATABASES = {
+                'default': {
+                    'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.postgresql'),
+                    'NAME': os.environ.get('DB_NAME', 'railway'),
+                    'USER': os.environ.get('DB_USER', 'postgres'),
+                    'PASSWORD': db_password,
+                    'HOST': db_host,
+                    'PORT': os.environ.get('DB_PORT', '5432'),
+                    'CONN_MAX_AGE': 600,
+                    'OPTIONS': {'sslmode': 'require'},
+                }
             }
-        }
+            print(f"Using PostgreSQL database: {db_host}")
+        else:
+            print("No DATABASE_URL or DB_* variables, using SQLite fallback")
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.sqlite3',
+                    'NAME': BASE_DIR / 'db.sqlite3',
+                }
+            }
 except Exception as e:
     print(f"Database configuration error: {e}, using SQLite fallback")
     DATABASES = {
