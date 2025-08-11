@@ -121,3 +121,20 @@ def railway_health_check(request):
             'error': str(e),
             'timestamp': timezone.now().isoformat()
         }, status=503)
+
+def about_page(request):
+    return render(request, 'core/about.html')
+
+def contact_page(request):
+    if request.method == 'POST':
+        # In production, send email or store message
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        # TODO: Integrate email backend or persistence
+        return JsonResponse({'success': True})
+    return render(request, 'core/contact.html')
+
+def terms_page(request):
+    return render(request, 'core/terms.html')
