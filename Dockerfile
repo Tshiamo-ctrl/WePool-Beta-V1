@@ -5,7 +5,7 @@ FROM python:3.10-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=wepool_project.settings_prod
+ENV DJANGO_SETTINGS_MODULE=wepool_project.settings_railway
 
 # Install system dependencies
 RUN apt-get update \

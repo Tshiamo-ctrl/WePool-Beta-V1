@@ -64,14 +64,59 @@ def health_check(request):
             cursor.execute("SELECT 1")
             cursor.fetchone()
         
+        # Get environment info
+        import os
+        env_info = {
+            'environment': os.environ.get('RAILWAY_ENVIRONMENT', 'unknown'),
+            'railway_service': os.environ.get('RAILWAY_SERVICE_NAME', 'unknown'),
+            'railway_revision': os.environ.get('RAILWAY_REVISION', 'unknown'),
+        }
+        
         return JsonResponse({
             'status': 'healthy',
             'database': 'connected',
-            'timestamp': timezone.now().isoformat()
+            'timestamp': timezone.now().isoformat(),
+            'railway': env_info,
+            'version': '1.0.0'
         }, status=200)
     except Exception as e:
         return JsonResponse({
             'status': 'unhealthy',
+            'database': 'disconnected',
+            'error': str(e),
+            'timestamp': timezone.now().isoformat()
+        }, status=503)
+
+def railway_health_check(request):
+    """Railway-specific health check endpoint"""
+    try:
+        # Test database connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+        
+        # Get Railway-specific environment info
+        import os
+        railway_info = {
+            'environment': os.environ.get('RAILWAY_ENVIRONMENT', 'unknown'),
+            'service_name': os.environ.get('RAILWAY_SERVICE_NAME', 'unknown'),
+            'revision': os.environ.get('RAILWAY_REVISION', 'unknown'),
+            'port': os.environ.get('PORT', '8000'),
+            'deployment': os.environ.get('RAILWAY_DEPLOYMENT_ID', 'unknown'),
+        }
+        
+        return JsonResponse({
+            'status': 'healthy',
+            'service': 'wepool',
+            'database': 'connected',
+            'timestamp': timezone.now().isoformat(),
+            'railway': railway_info,
+            'version': '1.0.0'
+        }, status=200)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'unhealthy',
+            'service': 'wepool',
             'database': 'disconnected',
             'error': str(e),
             'timestamp': timezone.now().isoformat()
