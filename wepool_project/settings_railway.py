@@ -15,9 +15,10 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '.railway.app').split(',')
 
 # Security settings for Railway
-SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'True') == 'True'
-SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'True') == 'True'
-CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'True') == 'True'
+# Disable SSL redirect to prevent loops - Railway handles HTTPS
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False  # Will be True when HTTPS is confirmed
+CSRF_COOKIE_SECURE = False     # Will be True when HTTPS is confirmed
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
@@ -125,11 +126,15 @@ SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 
 # Railway-specific optimizations
-if os.environ.get('RAILWAY_ENVIRONMENT') == 'production':
-    # Production optimizations
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    
-    # Trust Railway's proxy headers
-    USE_X_FORWARDED_HOST = True
-    USE_X_FORWARDED_PORT = True
+# Trust Railway's proxy headers
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+
+# Railway handles HTTPS at the proxy level, so we don't need to redirect
+# SECURE_SSL_REDIRECT = False  # Disabled to prevent redirect loops
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Set secure cookies only when we're sure we're on HTTPS
+SECURE_SSL_REDIRECT = False  # Let Railway handle HTTPS
+SESSION_COOKIE_SECURE = False  # Will be set to True when HTTPS is confirmed
+CSRF_COOKIE_SECURE = False    # Will be set to True when HTTPS is confirmed
