@@ -34,4 +34,5 @@ python manage.py migrate
 
 # Start the application
 echo "🚀 Starting Gunicorn server..."
-exec gunicorn --bind 0.0.0.0:$PORT --workers 3 --timeout 120 wepool_project.wsgi:application
+echo "🔌 Using port: ${PORT:-8000}"
+exec gunicorn --bind 0.0.0.0:${PORT:-8000} --workers 3 --timeout 120 wepool_project.wsgi:application

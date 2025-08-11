@@ -1,1 +1,1 @@
-web: gunicorn --bind 0.0.0.0:$PORT --workers 3 --timeout 120 wepool_project.wsgi:application
+web: gunicorn --bind 0.0.0.0:${PORT:-8000} --workers 3 --timeout 120 wepool_project.wsgi:application
