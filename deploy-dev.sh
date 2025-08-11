@@ -38,7 +38,7 @@ sleep 20
 
 # Check service health
 echo "🏥 Checking service health..."
-if curl -f http://localhost:8000/health/ > /dev/null 2>&1; then
+if curl -f http://localhost:8000/core/health/ > /dev/null 2>&1; then
     echo "✅ Application is healthy!"
 else
     echo "❌ Application health check failed!"
@@ -64,7 +64,7 @@ else:
 
 echo "🎉 Development deployment completed successfully!"
 echo "🌐 Application is available at: http://localhost:8000"
-echo "📊 Health check: http://localhost:8000/health/"
+echo "📊 Health check: http://localhost:8000/core/health/"
 echo "👤 Admin user: admin/admin123"
 echo ""
 echo "📋 Useful commands:"

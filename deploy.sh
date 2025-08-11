@@ -56,7 +56,7 @@ sleep 30
 
 # Check service health
 echo "🏥 Checking service health..."
-if curl -f http://localhost/health/ > /dev/null 2>&1; then
+if curl -f http://localhost/core/health/ > /dev/null 2>&1; then
     echo "✅ Application is healthy!"
 else
     echo "❌ Application health check failed!"
@@ -79,7 +79,7 @@ docker-compose exec web python manage.py collectstatic --noinput
 
 echo "🎉 Deployment completed successfully!"
 echo "🌐 Application is available at: https://localhost"
-echo "📊 Health check: https://localhost/health/"
+echo "📊 Health check: https://localhost/core/health/"
 echo ""
 echo "📋 Useful commands:"
 echo "  View logs: docker-compose logs -f"
