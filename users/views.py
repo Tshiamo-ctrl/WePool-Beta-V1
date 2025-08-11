@@ -13,6 +13,12 @@ from .models import Profile
 from core.models import Referral
 from core.utils import build_referral_matrix
 
+def landing_page(request):
+    """Landing page view for unauthenticated users"""
+    if request.user.is_authenticated:
+        return redirect('user_dashboard')
+    return render(request, 'landing.html')
+
 def register(request):
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
