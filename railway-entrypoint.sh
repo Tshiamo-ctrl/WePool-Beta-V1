@@ -93,6 +93,33 @@ for i in $(seq 1 $MAX_MIGRATE_RETRIES); do
   fi
 done
 
+# Optionally create superuser non-interactively via env vars
+if [ "${CREATE_SUPERUSER:-0}" = "1" ]; then
+  echo "👤 Ensuring superuser exists..."
+  python - <<'PY'
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", os.getenv("DJANGO_SETTINGS_MODULE", "wepool_project.settings_railway"))
+import django
+django.setup()
+from django.contrib.auth import get_user_model
+User = get_user_model()
+username = os.getenv("DJANGO_SUPERUSER_USERNAME")
+email = os.getenv("DJANGO_SUPERUSER_EMAIL")
+password = os.getenv("DJANGO_SUPERUSER_PASSWORD")
+if not username or not email or not password:
+    print("Missing DJANGO_SUPERUSER_* envs; skipping superuser creation")
+else:
+    user, created = User.objects.get_or_create(username=username, defaults={"email": email, "is_superuser": True, "is_staff": True})
+    if not created:
+        user.email = email
+        user.is_superuser = True
+        user.is_staff = True
+    user.set_password(password)
+    user.save()
+    print(f"Superuser {'created' if created else 'updated'}: {username}")
+PY
+fi
+
 # Start the application
 echo "🚀 Starting Gunicorn server on port $PORT..."
 exec gunicorn \
