@@ -141,7 +141,7 @@
                                     <h6>Update TAC Connector Status</h6>
                                     <div class="card bg-light">
                                         <div class="card-body">
-                                            <form id="tacconnector-form">
+                                            <div id="tacconnector-form">
                                                 <div class="form-check mb-3">
                                                     <input class="form-check-input"
                                                            type="checkbox"
@@ -163,7 +163,7 @@
                                                 <button type="submit" class="btn btn-info">
                                                     <i class="fas fa-sync-alt"></i> Update TAC Connector Info
                                                 </button>
-                                            </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -230,8 +230,9 @@ document.querySelectorAll('input[type="tel"]').forEach(input => {
 });
 
 // Update TAC Connector status
-document.getElementById('tacconnector-form')?.addEventListener('submit', function(e) {
-    e.preventDefault();
+document.getElementById('tacconnector-form')?.addEventListener('click', function(e) {
+    if (e.target && e.target.closest('button[type="submit"]')) {
+        e.preventDefault();
 
     const registered = document.getElementById('registered_tacconnector').checked;
     const link = document.getElementById('tacconnector_link').value;
@@ -249,10 +250,24 @@ document.getElementById('tacconnector-form')?.addEventListener('submit', functio
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
     submitBtn.disabled = true;
 
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
     fetch("{% url 'update_techconnect' %}", {
         method: 'POST',
         headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
+            'X-CSRFToken': getCookie('csrftoken'),
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: `registered=${registered}&tacconnector_link=${encodeURIComponent(link)}`
