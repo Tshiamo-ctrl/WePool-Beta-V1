@@ -181,6 +181,15 @@ h2 {
     color: #ffffff !important;
 }
 
+/* Ensure tab link specificity over inherited styles */
+.nav-tabs .nav-link, .nav-tabs .nav-link * {
+    color: var(--primary-color) !important;
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-link.active * {
+    color: var(--primary-color) !important;
+}
+
 .card-body {
     padding: 2rem;
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
@@ -413,7 +422,7 @@ h2 {
 }
 
 .nav-tabs .nav-link {
-    color: var(--primary-color); /* Blue by default */
+    color: var(--primary-color) !important; /* Blue by default */
     font-weight: 600;
     border: none;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
