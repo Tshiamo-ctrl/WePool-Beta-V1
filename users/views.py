@@ -30,7 +30,7 @@ def register(request):
             user.is_active = True  # Make email verification optional
             user.save()
 
-            # Update profile
+            # Update profile with user-provided values, including unique phone override
             profile = user.profile
             profile_data = profile_form.cleaned_data
             for field, value in profile_data.items():

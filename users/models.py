@@ -174,7 +174,12 @@ def check_yellow_qualification(self, override_check=False):
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
+        # Create a profile with temporary placeholder values for required fields
+        Profile.objects.create(
+            user=instance,
+            phone=f"tmp{uuid.uuid4().hex[:12]}",
+            member_type='paying'
+        )
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
