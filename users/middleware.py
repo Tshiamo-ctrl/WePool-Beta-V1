@@ -31,8 +31,10 @@ class ReferrerPromptMiddleware:
                 if hours >= 72:
                     return redirect(reverse('email_lock'))
 
-            # Prompt for referrer phone (allow dashboard and profile update paths)
+            # Prompt for referrer phone (admins/superusers exempt)
             if profile and not profile.referrer_phone:
+                if request.user.is_staff or request.user.is_superuser:
+                    return None
                 current_path = request.path or ''
                 allow_paths = [
                     reverse('update_profile'),
