@@ -5,8 +5,10 @@ from . import views
 urlpatterns = [
     path('', views.admin_dashboard, name='admin_dashboard'),
     path('users/', views.view_all_users, name='view_all_users'),
+    path('users/new/', views.create_user, name='create_user'),
     path('users/<int:profile_id>/edit/', views.edit_user, name='edit_user'),
     path('users/<int:profile_id>/delete/', views.delete_user, name='delete_user'),
+    path('users/<int:profile_id>/toggle-admin/', views.toggle_admin, name='toggle_admin'),
     path('users/<int:profile_id>/quick-override/', views.quick_override, name='quick_override'),
     path('users/<int:profile_id>/remove-override/', views.remove_override, name='remove_override'),
     path('paying-queue/', views.paying_queue, name='paying_queue'),

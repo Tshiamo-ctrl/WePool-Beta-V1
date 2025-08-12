@@ -663,115 +663,46 @@ def process_yellow_queue(request):
 # dashboard/views.py - Add these missing views
 
 @staff_member_required
-def override_history(request):
-    """View override history across all users"""
-    # Get all profiles with overrides
-    qualification_overrides = Profile.objects.filter(
-        qualification_overridden=True
-    ).select_related('user', 'overridden_by').order_by('-override_date')
-
-    admin_overrides = Profile.objects.filter(
-        admin_promotion_overridden=True
-    ).select_related('user', 'admin_overridden_by').order_by('-admin_override_date')
-
-    return render(request, 'dashboard/override_history.html', {
-        'qualification_overrides': qualification_overrides,
-        'admin_overrides': admin_overrides
-    })
-
-@staff_member_required
-def quick_override(request, profile_id):
-    """Quick override form for qualifications"""
-    profile = get_object_or_404(Profile, id=profile_id)
-
+def create_user(request):
     if request.method == 'POST':
-        form = QualificationOverrideForm(request.POST, current_user=request.user)
-
-        if form.is_valid():
-            override_type = form.cleaned_data['override_type']
-            reason = form.cleaned_data['reason']
-
-            try:
-                with transaction.atomic():
-                    if override_type == 'qualification':
-                        profile.qualification_overridden = True
-                        profile.override_reason = reason
-                        profile.overridden_by = request.user
-                        profile.override_date = timezone.now()
-                        profile.save()
-
-                        messages.success(request, f'Qualification override applied for {profile.user.get_full_name()}')
-
-                    elif override_type == 'admin_promotion' and request.user.is_superuser:
-                        profile.admin_promotion_overridden = True
-                        profile.admin_override_reason = reason
-                        profile.admin_overridden_by = request.user
-                        profile.admin_override_date = timezone.now()
-
-                        # Promote to staff
-                        profile.user.is_staff = True
-                        profile.user.save()
-                        profile.save()
-
-                        messages.success(request, f'Admin promotion override applied for {profile.user.get_full_name()}')
-
-                    elif override_type == 'admin_promotion' and not request.user.is_superuser:
-                        raise PermissionDenied("Only superusers can override admin promotion")
-
-                return redirect('edit_user', profile_id=profile.id)
-
-            except Exception as e:
-                messages.error(request, f'Error applying override: {str(e)}')
+        user_form = AdminUserEditForm(request.POST)
+        profile_form = AdminProfileEditForm(request.POST)
+        if user_form.is_valid() and profile_form.is_valid():
+            user = User(
+                username=user_form.cleaned_data['username'],
+                email=user_form.cleaned_data['email'],
+                first_name=user_form.cleaned_data['first_name'],
+                last_name=user_form.cleaned_data['last_name'],
+                is_active=user_form.cleaned_data.get('is_active', True)
+            )
+            user.set_password(User.objects.make_random_password())
+            # Only superuser can set is_staff
+            if request.user.is_superuser:
+                user.is_staff = user_form.cleaned_data.get('is_staff', False)
+            user.save()
+            profile = user.profile
+            for field, value in profile_form.cleaned_data.items():
+                setattr(profile, field, value)
+            profile.save()
+            messages.success(request, 'User created successfully.')
+            return redirect('view_all_users')
     else:
-        form = QualificationOverrideForm(current_user=request.user)
-
-    return render(request, 'dashboard/quick_override.html', {
-        'form': form,
-        'profile': profile
+        user_form = AdminUserEditForm()
+        profile_form = AdminProfileEditForm(current_user=request.user)
+    return render(request, 'dashboard/edit_user.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'creating': True
     })
 
 @staff_member_required
-def remove_override(request, profile_id):
-    """Remove override from a user"""
+def toggle_admin(request, profile_id):
     profile = get_object_or_404(Profile, id=profile_id)
-
-    if request.method == 'POST':
-        override_type = request.POST.get('override_type')
-
-        try:
-            with transaction.atomic():
-                if override_type == 'qualification':
-                    profile.qualification_overridden = False
-                    profile.override_reason = ''
-                    profile.overridden_by = None
-                    profile.override_date = None
-                    profile.save()
-
-                    # Re-check qualifications
-                    profile.check_yellow_qualification()
-                    profile.check_sponsored_qualification()
-
-                    messages.success(request, f'Qualification override removed for {profile.user.get_full_name()}')
-
-                elif override_type == 'admin_promotion':
-                    if not request.user.is_superuser:
-                        raise PermissionDenied("Only superusers can remove admin promotion overrides")
-
-                    profile.admin_promotion_overridden = False
-                    profile.admin_override_reason = ''
-                    profile.admin_overridden_by = None
-                    profile.admin_override_date = None
-
-                    # Check if user should still be admin based on normal qualifications
-                    if not profile.can_be_promoted_to_admin():
-                        profile.user.is_staff = False
-                        profile.user.save()
-                        messages.info(request, f'Admin status removed - user no longer meets qualification requirements')
-
-                    profile.save()
-                    messages.success(request, f'Admin promotion override removed for {profile.user.get_full_name()}')
-
-        except Exception as e:
-            messages.error(request, f'Error removing override: {str(e)}')
-
+    user = profile.user
+    if not request.user.is_superuser:
+        messages.error(request, 'Only superusers can change admin status.')
+        return redirect('edit_user', profile_id=profile.id)
+    user.is_staff = not user.is_staff
+    user.save()
+    messages.success(request, f"Admin status {'granted' if user.is_staff else 'revoked'} for {user.username}.")
     return redirect('edit_user', profile_id=profile.id)
