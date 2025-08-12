@@ -50,13 +50,6 @@
             </div>
         </div>
         <div class="col-lg-3 col-md-6 mb-3">
-            {% if profile.status == 'green' %}
-            {% set accent_class = 'accent-success' %}
-            {% elif profile.status == 'yellow' %}
-            {% set accent_class = 'accent-warning' %}
-            {% else %}
-            {% set accent_class = 'accent-secondary' %}
-            {% endif %}
             <div class="card user-stats-card {% if profile.status == 'green' %}accent-success{% elif profile.status == 'yellow' %}accent-warning{% else %}accent-secondary{% endif %}">
                 <div class="card-body">
                     <div class="user-stats-label">Status</div>
