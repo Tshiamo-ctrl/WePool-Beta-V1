@@ -144,7 +144,8 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@wepooltribe.com')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'noreply@wepooltribe.com')
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
 # Enable SMTP only if explicitly enabled and all creds provided
 EMAIL_ENABLED = os.environ.get('EMAIL_ENABLED', '0') == '1'
 if EMAIL_ENABLED and EMAIL_HOST and EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:

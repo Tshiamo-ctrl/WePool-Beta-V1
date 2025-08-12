@@ -4,6 +4,9 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
+from django.conf import settings
+from django.conf import settings as dj_settings
+DEFAULT_FROM_EMAIL = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@wepooltribe.com')
 from django.urls import reverse
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import JsonResponse
@@ -72,8 +75,8 @@ def register(request):
                 send_mail(
                     'New User Registration - WePool Tribe',
                     f'A new user has registered: {user.get_full_name()} ({user.email})\nMember Type: {profile.get_member_type_display_ui()}\nPhone: {profile.phone}',
-                    'noreply@wepooltribe.com',
-                    ['admin@wepooltribe.com'],
+                    DEFAULT_FROM_EMAIL,
+                    [getattr(settings, 'ADMIN_EMAIL', DEFAULT_FROM_EMAIL)],
                     fail_silently=True,
                 )
             except Exception:
