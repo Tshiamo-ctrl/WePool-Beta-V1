@@ -61,22 +61,28 @@ def register(request):
             current_site = get_current_site(request)
             verification_url = f"http://{current_site.domain}{reverse('verify_email', args=[str(profile.email_verification_token)])}"
 
-            send_mail(
-                'Verify your WePool Tribe account',
-                f'Welcome to WePool Tribe! Please click the following link to verify your email: {verification_url}',
-                'noreply@wepooltribe.com',
-                [user.email],
-                fail_silently=False,
-            )
+            try:
+                send_mail(
+                    'Verify your WePool Tribe account',
+                    f'Welcome to WePool Tribe! Please click the following link to verify your email: {verification_url}',
+                    'noreply@wepooltribe.com',
+                    [user.email],
+                    fail_silently=True,
+                )
+            except Exception:
+                pass
 
-            # Send admin notification
-            send_mail(
-                'New User Registration - WePool Tribe',
-                f'A new user has registered: {user.get_full_name()} ({user.email})\nMember Type: {profile.get_member_type_display_ui()}\nPhone: {profile.phone}',
-                'noreply@wepooltribe.com',
-                ['admin@wepooltribe.com'],
-                fail_silently=True,
-            )
+            # Send admin notification (best-effort)
+            try:
+                send_mail(
+                    'New User Registration - WePool Tribe',
+                    f'A new user has registered: {user.get_full_name()} ({user.email})\nMember Type: {profile.get_member_type_display_ui()}\nPhone: {profile.phone}',
+                    'noreply@wepooltribe.com',
+                    ['admin@wepooltribe.com'],
+                    fail_silently=True,
+                )
+            except Exception:
+                pass
 
             messages.success(request, 'Registration successful! Please check your email to verify your account.')
             return redirect('login')
