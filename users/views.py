@@ -62,13 +62,8 @@ def register(request):
             verification_url = f"http://{current_site.domain}{reverse('verify_email', args=[str(profile.email_verification_token)])}"
 
             try:
-                send_mail(
-                    'Verify your WePool Tribe account',
-                    f'Welcome to WePool Tribe! Please click the following link to verify your email: {verification_url}',
-                    'noreply@wepooltribe.com',
-                    [user.email],
-                    fail_silently=True,
-                )
+                from .emails import send_verification_email
+                send_verification_email(user, verification_url)
             except Exception:
                 pass
 
