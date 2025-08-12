@@ -7,6 +7,38 @@ from django.utils import timezone
 import uuid
 
 class Profile(models.Model):
+    def check_yellow_qualification(self, override_check: bool = False) -> bool:
+        if self.qualification_overridden and not override_check:
+            return False
+        if self.verified_email and self.registered_tacconnector and self.tacconnector_link:
+            self.status = 'yellow'
+            self.save()
+            return True
+        return False
+
+    def check_sponsored_qualification(self, override_check: bool = False) -> bool:
+        if self.qualification_overridden and not override_check:
+            return False
+        if self.member_type == 'sponsored':
+            from core.models import Referral
+            paying_referrals = Referral.objects.filter(
+                referrer=self,
+                referred__member_type='paying'
+            ).count()
+            if paying_referrals >= 4:
+                self.status = 'qualified'
+                self.save()
+                return True
+        return False
+
+    def can_be_promoted_to_admin(self) -> bool:
+        if self.admin_promotion_overridden:
+            return True
+        return (
+            self.status == 'green' and
+            self.paid_for_sponsored and
+            self.paid_for_self
+        )
     MEMBER_TYPE_CHOICES = [
         ('paying', 'Paying Member'),
         ('sponsored', 'PIF Member'),  # Changed for display only
@@ -131,45 +163,7 @@ class Profile(models.Model):
         
         return f"https://live.taconnector.africa/product/train-a-connector/?ref={ref_param}"
 
-# users/models.py - Update the qualification check methods
-def check_yellow_qualification(self, override_check=False):
-    """Check if user qualifies for Yellow status"""
-    if self.qualification_overridden and not override_check:
-        return False
-
-    if (self.verified_email and
-        self.registered_tacconnector and  # Updated field name
-        self.tacconnector_link):          # Updated field name
-        self.status = 'yellow'
-        self.save()
-        return True
-    return False
-
-    def check_sponsored_qualification(self, override_check=False):
-        """Check if PIF member is qualified"""
-        if self.qualification_overridden and not override_check:
-            return False
-
-        if self.member_type == 'sponsored':
-            from core.models import Referral
-            paying_referrals = Referral.objects.filter(
-                referrer=self,
-                referred__member_type='paying'
-            ).count()
-            if paying_referrals >= 4:
-                self.status = 'qualified'
-                self.save()
-                return True
-        return False
-
-    def can_be_promoted_to_admin(self):
-        """Check if user can be promoted to admin"""
-        if self.admin_promotion_overridden:
-            return True
-
-        return (self.status == 'green' and
-                self.paid_for_sponsored and
-                self.paid_for_self)
+# Qualification methods are defined on Profile class below
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
