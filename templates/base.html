@@ -70,6 +70,17 @@
         </div>
     {% endif %}
 
+    {% if show_email_verification_banner %}
+        <div class="container mt-3">
+            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                <i class="fas fa-envelope me-2"></i>
+                <div>
+                    Please verify your email within {{ email_verification_hours_left }} hour{{ email_verification_hours_left|pluralize }} to avoid account lock.
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     <!-- Main Content -->
     <main class="py-4">
         {% block content %}{% endblock %}

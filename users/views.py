@@ -27,7 +27,7 @@ def register(request):
         if user_form.is_valid() and profile_form.is_valid():
             # Create user
             user = user_form.save(commit=False)
-            user.is_active = False  # Require email verification
+            user.is_active = True  # Make email verification optional
             user.save()
 
             # Update profile
@@ -246,3 +246,6 @@ def debug_login(request):
 
     except User.DoesNotExist:
         return JsonResponse({'error': 'User does not exist', 'user_exists': False})
+
+def email_lock(request):
+    return render(request, 'users/email_lock.html')
