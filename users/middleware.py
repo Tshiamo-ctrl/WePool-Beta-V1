@@ -1,6 +1,7 @@
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
+import os
 
 class ReferrerPromptMiddleware:
     def __init__(self, get_response):
@@ -30,7 +31,13 @@ class ReferrerPromptMiddleware:
                 if hours >= 72:
                     return redirect(reverse('email_lock'))
 
-            # Prompt for referrer phone
+            # Prompt for referrer phone (allow dashboard and profile update paths)
             if profile and not profile.referrer_phone:
-                return redirect(f"{reverse('update_profile')}?need_referrer=1")
+                current_path = request.path or ''
+                allow_paths = [
+                    reverse('update_profile'),
+                    reverse('user_dashboard'),
+                ]
+                if current_path not in allow_paths:
+                    return redirect(f"{reverse('update_profile')}?need_referrer=1")
         return None
