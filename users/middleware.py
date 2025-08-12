@@ -16,7 +16,11 @@ class ReferrerPromptMiddleware:
             exempt_names = {
                 'update_profile', 'logout', 'login', 'terms', 'about', 'contact',
                 'railway_health_check', 'health_check', 'email_lock', 'verify_email',
-                'password_reset', 'password_reset_done', 'password_reset_confirm', 'password_reset_complete'
+                'password_reset', 'password_reset_done', 'password_reset_confirm', 'password_reset_complete',
+                # Admin dashboard routes
+                'admin_dashboard', 'view_all_users', 'edit_user', 'delete_user', 'toggle_admin', 'create_user',
+                'paying_queue', 'sponsored_queue', 'yellow_members', 'qualified_sponsored', 'assign_members',
+                'export_data', 'override_history', 'dashboard_stats', 'bulk_update_status', 'process_yellow_queue'
             }
             try:
                 if request.resolver_match and request.resolver_match.url_name in exempt_names:
