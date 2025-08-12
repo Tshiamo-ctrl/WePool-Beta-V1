@@ -413,7 +413,7 @@ h2 {
 }
 
 .nav-tabs .nav-link {
-    color: var(--text-secondary);
+    color: var(--text-primary); /* Ensure visible by default */
     font-weight: 600;
     border: none;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -421,12 +421,13 @@ h2 {
     margin-bottom: -3px;
     transition: all 0.3s ease;
     position: relative;
+    background: transparent;
 }
 
 .nav-tabs .nav-link:hover {
     border-color: transparent;
-    background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
-    color: #ffffff;
+    background: rgba(6, 182, 212, 0.08); /* subtle hover */
+    color: var(--primary-color);
     transform: translateY(-2px);
 }
 
