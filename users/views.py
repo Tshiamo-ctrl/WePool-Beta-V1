@@ -144,7 +144,7 @@ def update_techconnect_status(request):
     if request.method == 'POST':
         profile = request.user.profile
 
-        registered = request.POST.get('registered') == 'true'
+        registered = request.POST.get('registered') in ['true', 'True', '1', True]
         tacconnector_link = request.POST.get('tacconnector_link', '')
 
         # Use new field names

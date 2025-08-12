@@ -15,6 +15,41 @@
     
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+    <style>
+      /* Enlarge brand/logo */
+      .navbar .navbar-brand { font-size: 1.6rem; }
+      .navbar .navbar-brand i { font-size: 1.4em; }
+
+      /* Wobble animation for floating icon cards */
+      @keyframes wobble {
+        0%, 100% { transform: translateY(0) rotate(0); }
+        25% { transform: translateY(-6px) rotate(1deg); }
+        50% { transform: translateY(0) rotate(-1deg); }
+        75% { transform: translateY(6px) rotate(1deg); }
+      }
+      .floating-card { animation: wobble 3s ease-in-out infinite; }
+      .floating-card.card2 { animation-delay: .6s; }
+      .floating-card.card3 { animation-delay: 1.2s; }
+
+      /* Ripple animation on WePool text */
+      .hero-title .text-gradient { position: relative; display: inline-block; }
+      .hero-title .text-gradient::after {
+        content: '';
+        position: absolute;
+        left: 50%; top: 50%;
+        width: 0; height: 0;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(14,165,233,.25) 0%, rgba(14,165,233,0) 60%);
+        animation: text-ripple 2.8s ease-out infinite;
+        pointer-events: none;
+      }
+      @keyframes text-ripple {
+        0% { width: 0; height: 0; opacity: .8; }
+        60% { width: 200%; height: 200%; opacity: .15; }
+        100% { width: 260%; height: 260%; opacity: 0; }
+      }
+    </style>
 </head>
 <body>
     <!-- Water Background Animation -->
@@ -38,13 +73,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#features">Features</a>
+                        <a class="nav-link" href="{% url 'about' %}">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#about">About</a>
+                        <a class="nav-link" href="{% url 'contact' %}">Contact</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
+                        <a class="nav-link" href="{% url 'terms' %}">Terms</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-outline-light btn-sm ms-2" href="{% url 'login' %}">Login</a>
@@ -87,7 +122,7 @@
                             <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-3">
                                 <i class="fas fa-rocket me-2"></i>Get Started
                             </a>
-                            <a href="#features" class="btn btn-outline-primary btn-lg">
+                            <a href="{% url 'about' %}" class="btn btn-outline-primary btn-lg">
                                 <i class="fas fa-play me-2"></i>Learn More
                             </a>
                         </div>
@@ -255,10 +290,8 @@
             <div class="row">
                 <div class="col-lg-4">
                     <div class="footer-brand">
-                        <div class="logo-container">
-                            <div class="logo-icon">
-                                <i class="fas fa-water"></i>
-                            </div>
+                        <div class="logo-container d-flex align-items-center">
+                            <i class="fas fa-water me-2"></i>
                             <span class="logo-text">WePool</span>
                         </div>
                         <p>Connecting innovators worldwide through our revolutionary digital tribe platform.</p>
@@ -267,8 +300,7 @@
                 <div class="col-lg-2">
                     <h5>Platform</h5>
                     <ul class="footer-links">
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="#about">About</a></li>
+                        <li><a href="{% url 'about' %}">About</a></li>
                         <li><a href="{% url 'register' %}">Join</a></li>
                         <li><a href="{% url 'login' %}">Login</a></li>
                     </ul>
@@ -276,10 +308,8 @@
                 <div class="col-lg-2">
                     <h5>Support</h5>
                     <ul class="footer-links">
-                        <li><a href="#contact">Contact</a></li>
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Community</a></li>
-                        <li><a href="#">Terms</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="{% url 'terms' %}">Terms</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4">
