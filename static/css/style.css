@@ -413,7 +413,7 @@ h2 {
 }
 
 .nav-tabs .nav-link {
-    color: var(--text-primary); /* Ensure visible by default */
+    color: var(--primary-color); /* Blue by default */
     font-weight: 600;
     border: none;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
