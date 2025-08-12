@@ -422,7 +422,7 @@ h2 {
 }
 
 .nav-tabs .nav-link {
-    color: var(--primary-color) !important; /* Blue by default */
+    color: #000000 !important; /* Black by default */
     font-weight: 600;
     border: none;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;

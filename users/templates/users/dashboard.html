@@ -323,13 +323,29 @@ document.getElementById('tacconnector-form')?.addEventListener('submit', functio
     const registered = document.getElementById('registered_tacconnector').checked;
     const link = document.getElementById('tacconnector_link').value;
 
+    // CSRF helper from cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     fetch("{% url 'update_techconnect' %}", {
         method: 'POST',
         headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
+            'X-CSRFToken': getCookie('csrftoken'),
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `registered=${registered}&tacconnector_link=${link}`
+        body: `registered=${registered}&tacconnector_link=${encodeURIComponent(link)}`
     })
     .then(response => response.json())
     .then(data => {
