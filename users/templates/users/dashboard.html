@@ -44,7 +44,7 @@
         <div class="col-lg-3 col-md-6 mb-3">
             <div class="card user-stats-card accent-primary">
                 <div class="card-body">
-                    <div class="user-stats-label">Member Type</div>
+                    <div class="user-stats-label" style="color: var(--primary-color);">Member Type</div>
                     <p class="user-stats-value">{{ profile.get_member_type_display_ui }}</p>
                 </div>
             </div>
@@ -52,7 +52,7 @@
         <div class="col-lg-3 col-md-6 mb-3">
             <div class="card user-stats-card {% if profile.status == 'green' %}accent-success{% elif profile.status == 'yellow' %}accent-warning{% else %}accent-secondary{% endif %}">
                 <div class="card-body">
-                    <div class="user-stats-label">Status</div>
+                    <div class="user-stats-label" style="color: var(--primary-color);">Status</div>
                     <p class="user-stats-value">{{ profile.get_status_display }}</p>
                 </div>
             </div>
@@ -60,7 +60,7 @@
         <div class="col-lg-3 col-md-6 mb-3">
             <div class="card user-stats-card accent-info">
                 <div class="card-body">
-                    <div class="user-stats-label">Direct Referrals</div>
+                    <div class="user-stats-label" style="color: var(--primary-color);">Direct Referrals</div>
                     <p class="user-stats-value">{{ direct_referrals.count }}</p>
                 </div>
             </div>
@@ -68,7 +68,7 @@
         <div class="col-lg-3 col-md-6 mb-3">
             <div class="card user-stats-card accent-secondary">
                 <div class="card-body">
-                    <div class="user-stats-label">Email Status</div>
+                    <div class="user-stats-label" style="color: var(--primary-color);">Email Status</div>
                     <p class="user-stats-value">{% if profile.verified_email %}Verified{% else %}Not Verified{% endif %}</p>
                 </div>
             </div>

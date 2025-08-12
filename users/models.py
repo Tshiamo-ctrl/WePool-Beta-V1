@@ -146,14 +146,15 @@ class Profile(models.Model):
         return 'Paying Member'
 
     def generate_tacconnector_link(self):
-        """Generate TAC Connector link with full name as ref parameter"""
-        parts = [
-            self.user.first_name.strip().lower(),
-            *(self.middle_names.strip().lower().split() if self.middle_names else []),
-            self.user.last_name.strip().lower(),
-        ]
-        # Join with '+' to form the reference
-        ref_param = '+'.join(filter(None, parts))
+        """Generate TAC Connector link with format: firstname + secondname(if any) . surname"""
+        first = self.user.first_name.strip().lower()
+        middle = ''
+        if self.middle_names:
+            parts = self.middle_names.strip().split()
+            if parts:
+                middle = '+' + parts[0].lower()
+        last = self.user.last_name.strip().lower()
+        ref_param = f"{first}{middle}.{last}" if last else f"{first}{middle}"
         return f"https://live.taconnector.africa/product/train-a-connector/?ref={ref_param}"
 
 # Qualification methods are defined on Profile class below
