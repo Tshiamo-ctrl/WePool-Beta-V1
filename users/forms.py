@@ -99,7 +99,7 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = [
-            'phone', 'date_of_birth', 'city', 'state', 'country', 'zip_code',  # Removed 'address'
+            'phone', 'referrer_phone', 'date_of_birth', 'city', 'state', 'country', 'zip_code',
             'communications_opt_in'
         ]
         widgets = {
@@ -108,8 +108,16 @@ class ProfileUpdateForm(forms.ModelForm):
                 'pattern': '[0-9]*',
                 'inputmode': 'numeric',
                 'class': 'form-control',
-                'readonly': True,  # Don't allow phone changes in profile update
+                'readonly': True,
                 'title': 'Phone number cannot be changed'
+            }),
+            'referrer_phone': forms.TextInput(attrs={
+                'type': 'tel',
+                'pattern': '[0-9]*',
+                'inputmode': 'numeric',
+                'class': 'form-control',
+                'placeholder': 'Referrer phone number (numbers only)',
+                'title': 'Please enter numbers only'
             }),
             'date_of_birth': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'City/Suburb'}),
@@ -117,3 +125,9 @@ class ProfileUpdateForm(forms.ModelForm):
             'country': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Country'}),
             'zip_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ZIP/Postal Code'}),
         }
+
+    def clean_referrer_phone(self):
+        referrer_phone = self.cleaned_data.get('referrer_phone')
+        if referrer_phone and not referrer_phone.isdigit():
+            raise forms.ValidationError("Referrer phone number must contain only digits.")
+        return referrer_phone

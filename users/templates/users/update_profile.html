@@ -49,6 +49,7 @@
                                             <small class="form-text text-muted">Phone number is linked to your account and cannot be modified.</small>
                                         </div>
 
+                                        {{ form.referrer_phone|as_crispy_field }}
                                         {{ form.date_of_birth|as_crispy_field }}
                                     </div>
                                     <div class="col-md-6">
@@ -179,6 +180,12 @@
                                 <i class="fas fa-save"></i> Update Profile
                             </button>
                         </div>
+
+                        {% if request.GET.need_referrer %}
+                        <div class="mt-3 alert alert-info">
+                            Enter your referrer phone number above and click Update Profile to continue.
+                        </div>
+                        {% endif %}
                     </form>
                 </div>
             </div>
